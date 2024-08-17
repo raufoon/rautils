@@ -69,7 +69,7 @@ class FolderServer:
             if res > 1:
                 ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
                 print('Exception raise failure')
-        print(f"Server at port {cls.port} stopped.")
+        print(f"Server on port {cls.port} stopped.")
 
     @classmethod
     def restart(cls):
