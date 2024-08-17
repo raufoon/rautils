@@ -36,7 +36,7 @@ class FolderServer:
                 print(f"Failed to start server: {e}")
                 cls._httpd = None
                 cls._server_thread = None
-        return cls._port
+        return cls
 
     @classmethod
     def _find_free_port(cls) -> int:
@@ -50,7 +50,7 @@ class FolderServer:
         """Start the server if not already running and return the port."""
         if cls._httpd is None:
             cls()
-        return cls._port
+        return cls
 
     @classmethod
     def stop(cls):
@@ -70,6 +70,7 @@ class FolderServer:
                 ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
                 print('Exception raise failure')
         print(f"Server on port {cls.port} stopped.")
+        return cls
 
     @classmethod
     def restart(cls):
