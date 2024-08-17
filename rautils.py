@@ -1,4 +1,3 @@
-#### Server Utility ####
 import os
 import threading
 import http.server
@@ -11,6 +10,7 @@ class FolderServer:
     _httpd = None
     _port = None
     _folder = None
+
     def __new__(cls, path=None):
         return cls._start_server(path)
 
@@ -20,19 +20,14 @@ class FolderServer:
         if cls._httpd is None or path != cls._folder:
             cls.stop(no_output=True)
             cls._port = cls._find_free_port()
-            #print(f"Found available port at {cls._port}")
-            cwd = os.getcwd()
             try:
-                # Set to the specified path or use the current working directory
-                if path is not None:
-                    os.chdir(path)
-                    cls._folder = path
-                else:
-                    os.chdir(os.getcwd())
-                    cls._folder = os.getcwd()
+                cls._folder = path or os.getcwd()
 
                 Handler = http.server.SimpleHTTPRequestHandler
-                cls._httpd = socketserver.TCPServer(("", cls._port), Handler)
+                cls._httpd = socketserver.TCPServer(
+                    ("", cls._port),
+                    lambda *args, **kwargs: Handler(*args, directory=cls._folder, **kwargs)
+                )
                 cls._server_thread = threading.Thread(target=cls._httpd.serve_forever)
                 cls._server_thread.start()
                 print(f"Server started on port {cls._port} serving directory {cls._folder}")
@@ -40,7 +35,7 @@ class FolderServer:
                 print(f"Failed to start server: {e}")
                 cls._httpd = None
                 cls._server_thread = None
-            os.chdir(cwd)            
+                
         return cls
 
     @classmethod
@@ -56,7 +51,7 @@ class FolderServer:
         return cls(path)
 
     @classmethod
-    def stop(cls, no_output = False):
+    def stop(cls, no_output=False):
         """Stop the server and shutdown the server thread if running."""
         if cls._httpd is not None:
             cls._httpd.shutdown()
@@ -94,4 +89,3 @@ class FolderServer:
     def serving_folder(cls) -> str:
         """Get the current serving folder."""
         return cls._folder
-#### ============= ####
