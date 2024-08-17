@@ -19,7 +19,7 @@ class FolderServer:
         """Start the server and save the port number. Optionally set the directory path."""
         if cls._httpd is None:
             cls._port = cls._find_free_port()
-            print(f"Found available port at {cls._port}")
+            #print(f"Found available port at {cls._port}")
             try:
                 # Set to the specified path or use the current working directory
                 if path is not None:
@@ -61,7 +61,6 @@ class FolderServer:
             cls._httpd.server_close()
             cls._httpd = None
             cls._server_thread = None
-            print("Server stopped.")
 
         # Forcefully terminate the thread if still alive
         if cls._server_thread and cls._server_thread.is_alive():
@@ -71,7 +70,7 @@ class FolderServer:
                 ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, 0)
                 print('Exception raise failure')
         
-        print("All server threads have been stopped.")
+       print(f"Server at port {cls.port} stopped.")
 
     @classmethod
     def restart(cls):
