@@ -21,6 +21,7 @@ class FolderServer:
             cls.stop(no_output=True)
             cls._port = cls._find_free_port()
             #print(f"Found available port at {cls._port}")
+            cwd = os.getcwd()
             try:
                 # Set to the specified path or use the current working directory
                 if path is not None:
@@ -39,6 +40,7 @@ class FolderServer:
                 print(f"Failed to start server: {e}")
                 cls._httpd = None
                 cls._server_thread = None
+            os.chdir(cwd)            
         return cls
 
     @classmethod
