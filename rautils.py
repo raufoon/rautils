@@ -18,7 +18,7 @@ class FolderServer:
     def _start_server(cls, path=None):
         """Start the server and save the port number. Optionally set the directory path."""
         if cls._httpd is None or path != cls._folder:
-            cls._stop(no_output=True)
+            cls.stop(no_output=True)
             cls._port = cls._find_free_port()
             #print(f"Found available port at {cls._port}")
             try:
@@ -49,9 +49,9 @@ class FolderServer:
             return s.getsockname()[1]
 
     @classmethod
-    def start(cls):
+    def start(cls, path=None):
         """Start the server if not already running and return the port."""
-        return cls()
+        return cls(path)
 
     @classmethod
     def stop(cls, no_output = False):
