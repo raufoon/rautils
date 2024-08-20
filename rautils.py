@@ -1,9 +1,14 @@
+###############################
+######## Folder Server ########
+###############################
+
 import os
 import threading
 import http.server
 import socketserver
 import socket
 import ctypes
+import requests
 
 class FolderServer:
     _server_thread = None
@@ -86,6 +91,20 @@ class FolderServer:
 
     @classmethod
     @property
-    def serving_folder(cls) -> str:
+    def folder(cls) -> str:
         """Get the current serving folder."""
         return cls._folder
+    
+    @classmethod
+    @property
+    def fileslistHTML(cls):
+        """Get the list of files in the server folder as HTML."""
+        response = requests.get(cls.url)
+        if response.status_code == 200:
+            return response.text
+        else:
+            return f"Failed to access {server_url}, Status code: {response.status_code}"
+            
+###############################
+#--------------Ø--------------#
+###############################
