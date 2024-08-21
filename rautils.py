@@ -97,9 +97,9 @@ class FolderServer:
     
     @classmethod
     @property
-    def fileslistHTML(cls):
+    def fileslistHTML(cls, subfolder=""):
         """Get the list of files in the server folder as HTML."""
-        response = requests.get(cls.url)
+        response = requests.get(cls.url+subfolder)
         if response.status_code == 200:
             return response.text
         else:
