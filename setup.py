@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='rautils',
-    version='0.1',
+    version='0.11',
     py_modules=['rautils'],
     description='A library containing utility functions for personal projects',
     packages=find_packages(), 
