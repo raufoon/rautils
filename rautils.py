@@ -1,4 +1,34 @@
 ###############################
+########## ipy-input ##########
+###############################
+
+import ipywidgets as ipy
+def ipyinput(*widgets):
+    import jupyter_ui_poll as poll, time; from IPython.display import display
+    widgets = list(widgets)
+    for i, widget in enumerate(widgets):
+      if isinstance(widget, ipy.Button): continue
+      if isinstance(widget, str): widget = ipy.Text(description = widget)
+      widgets[i] = widget
+
+    button = ipy.Button(description = "Submit")
+    button_clicked = False
+    def on_button_clicked(b):
+        nonlocal button_clicked
+        button_clicked,b.description,b.disabled = True,"Submitted",True
+        for widget in widgets: widget.disabled,widget.description,widget.style = (
+            True,f'[{repr(widget.value)} submitted] '+widget.description,{'description_width': 'initial'})
+    button.on_click(on_button_clicked)
+
+    display(*widgets, button)
+    with poll.ui_events() as poll_event:
+        while not button_clicked: poll_event(10); time.sleep(0.5)
+
+    return [widget.value for widget in widgets]
+
+#--------------Ø--------------#
+
+###############################
 ######## Folder Server ########
 ###############################
 
@@ -105,6 +135,4 @@ class FolderServer:
         else:
             return f"Failed to access {server_url}, Status code: {response.status_code}"
             
-###############################
 #--------------Ø--------------#
-###############################
