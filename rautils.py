@@ -9,6 +9,8 @@ def ipyinput(*widgets):
     for i, widget in enumerate(widgets):
       if isinstance(widget, ipy.Button): continue
       if isinstance(widget, str): widget = ipy.Text(description = widget)
+      if isinstance(widget, ipy.RadioButtons):
+        widget.options = [(str(x),x) for x in widget.options] if not isinstance(widget.options[0], str) else widget.options
       widgets[i] = widget
 
     button = ipy.Button(description = "Submit")
@@ -16,14 +18,19 @@ def ipyinput(*widgets):
     def on_button_clicked(b):
         nonlocal button_clicked
         button_clicked,b.description,b.disabled = True,"Submitted",True
-        for widget in widgets: widget.disabled,widget.description,widget.style = (
-            True,f'[{repr(widget.value)} submitted] '+widget.description,{'description_width': 'initial'})
+        for widget in widgets:
+          widget.disabled = True
+          if isinstance(widget, ipy.RadioButtons):
+            original_value = widget.value
+            for i in range(len(options:=list(widget.options))):
+              if options[i][1] == widget.value: options[i] = (f'»{options[i][0]}«',options[i][1]); break
+            widget.options, widget.value = options, original_value
     button.on_click(on_button_clicked)
 
     display(*widgets, button)
     with poll.ui_events() as poll_event:
         while not button_clicked: poll_event(10); time.sleep(0.5)
-
+        
     return [widget.value for widget in widgets]
 
 #--------------Ø--------------#
