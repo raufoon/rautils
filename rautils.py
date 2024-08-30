@@ -36,6 +36,62 @@ def ipyinput(*widgets):
 #--------------Ø--------------#
 
 ###############################
+######## Download URLS ########
+###############################
+
+import requests
+import urllib.parse
+from lxml import html
+
+def get_download_urls(file_name, keywords=[], skip_keywords=[], search_url = "https://www.google.com/search?q=%s"):
+  ext = '.'+file_name.split('.')[-1]
+  if 'google' in search_url:
+    search_url = search_url % urllib.parse.quote(file_name)
+  headers = {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
+  try:
+    response = requests.get(search_url, headers=headers, timeout=2)
+    response.raise_for_status()
+    # Parse the response content with lxml
+    tree = html.fromstring(response.content)
+    # Use XPath to find all anchor tags with href attributes
+    all_a = tree.xpath('//a[@href]')
+  except:
+    return set()
+
+  results = set()
+  for a_tag in all_a:
+    dirurl=False
+    href = a_tag.get('href', '').replace('%25','%')
+    if any(keyword in href for keyword in skip_keywords): continue
+    has_keywords = True if not keywords else False
+    if 'url=' in href:
+      href = href.split('url=')[-1]
+    if href.startswith(search_url.split('dir=')[-1]):
+      dirurl=True
+      href = search_url.split('dir=')[0]+'dir='+href
+    if 'dir=' in href:
+      dirurl=True
+
+    if ext in href and not href.endswith(ext): href = href.split(ext)[0]+ext
+    if not has_keywords:  has_keywords = any(keyword in href.lower() for keyword in keywords)
+    if "http" in href and 'google' not in href and ((file_name in href) or has_keywords):
+        splithref = href.split('&ved=')
+        result_url = splithref[0] if len(splithref) == 1 else urllib.parse.unquote(splithref[0])
+        result_url = result_url.split('&h=')[0]
+        urls=set()
+        if 'google' in search_url and file_name not in result_url:
+          urls.update(get_download_urls(file_name, keywords, skip_keywords,result_url))
+        else:
+          urls.add(result_url)
+        for url in urls:
+          if url.endswith(file_name):
+            results.add(url)
+  return results
+
+#--------------Ø--------------#
+
+###############################
 ######## Folder Server ########
 ###############################
 
