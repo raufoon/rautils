@@ -9,6 +9,7 @@ setup(
     install_requires=[
         'ipywidgets>=7.0.0',
         'jupyter-ui-poll',
+        'lxml',
     ],
     python_requires='>=3.6', 
 )
